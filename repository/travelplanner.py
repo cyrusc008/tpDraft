@@ -1,8 +1,13 @@
 # The Travel Planner 
-
 import numpy as np 
 import math 
 import matplotlib.pyplot as plt 
+import pandas
+import argparse
+import pandas as pd
+import numpy as np
+import csv
+from collections import namedtuple
 
 route = [ ( 2, 1, 'A'), ( 3, 1, ''), ( 4, 1, ''),  ( 5, 1, ''),
           ( 6, 1, ''),  (7, 1, 'B'), ( 7, 2, ''),  ( 8, 2, ''),
@@ -127,3 +132,26 @@ def route_cc(route):
 start_point, cc = route_cc(route)
 print((f"The bus route starts at {start_point} and\n"
        f"it's described by this chain code:\n{cc}"))
+
+def read_passengers():
+    """
+    csv parser 
+    """
+    parser = argparse.ArgumentParser(description="passengers")
+    parser.add_argument("filename", help="passengers.csv")
+    args = parser.parse_args()
+    filename = args.filename
+    passenger = []
+    with open(filename, 'r') as data:
+        reader = csv.reader(data, delimiter=',')
+        headers = None
+        for row in reader:
+            line = [x for x in row]
+            start = (int(line[0]), int(line[1]))
+            end = (int(line[2]), int(line[3]))
+            speed = (int(line[4]))
+            data = (start, end, speed)
+            passenger.append(data)
+    return passenger
+
+print(read_passengers()) 
