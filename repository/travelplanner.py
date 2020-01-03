@@ -133,14 +133,10 @@ start_point, cc = route_cc(route)
 print((f"The bus route starts at {start_point} and\n"
        f"it's described by this chain code:\n{cc}"))
 
-def read_passengers():
+def read_passengers(filename):
     """
-    csv parser 
+    passenger csv parser 
     """
-    parser = argparse.ArgumentParser(description="passengers")
-    parser.add_argument("filename", help="passengers.csv")
-    args = parser.parse_args()
-    filename = args.filename
     passenger = []
     with open(filename, 'r') as data:
         reader = csv.reader(data, delimiter=',')
@@ -154,4 +150,19 @@ def read_passengers():
             passenger.append(data)
     return passenger
 
-print(read_passengers()) 
+def read_routes(filename):
+    """
+    routes csv parser 
+    """
+    route = []
+    with open(filename, 'r') as data:
+        reader = list(csv.reader(data, delimiter=','))
+        headers = None
+        for row in reader:
+            line = [x for x in row]
+            position = (int(line[0]), int(line[1]), line[2])
+            route.append(position)
+    return route
+
+print(read_passengers("passengers.csv")) 
+print(read_routes("route.csv"))
