@@ -1,4 +1,5 @@
-# The Travel Planner 
+# The Travel Planner
+import csv 
 import pandas as np 
 import numpy as np 
 import math 
