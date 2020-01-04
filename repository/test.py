@@ -2,8 +2,37 @@ import numpy as np
 import csv
 import matplotlib.pyplot as plt
 import math
+import types 
 
-class Passenger():
+def read_passengers(filename):
+    passenger = []
+    with open(filename, 'r') as data:
+        reader = csv.reader(data, delimiter=',')
+        headers = None
+        for row in reader:
+            line = [x for x in row]
+            start = (int(line[0]), int(line[1]))
+            end = (int(line[2]), int(line[3]))
+            speed = (int(line[4]))
+            data = (start, end, speed)
+            passenger.append(data)
+    return passenger
+
+def passenger_trip(passenger, route):
+    start, end, pace = passenger
+    stops = [value for value in route if value[2]]
+    # calculate closer stops
+    ## to start
+    distances = [(math.sqrt((x - start[0])**2 +
+                            (y - start[1])**2), stop) for x,y,stop in stops]
+    closer_start = min(distances)
+    ## to end
+    distances = [(math.sqrt((x - end[0])**2 +
+                            (y - end[1])**2), stop) for x,y,stop in stops]
+    closer_end = min(distances)
+    return (closer_start, closer_end)
+
+class Passenger:
     def __init__(self, start, end, speed):
         self.start = start 
         self.end = end
@@ -11,9 +40,12 @@ class Passenger():
 
     def walk_time(self): 
         times = math.sqrt((self.start[0] - self.end[0])**2 + (self.start[1] - self.end[1])**2)*self.speed
-        return times 
+        return print(f" Walking Time: {times} minutes") 
 
-class Route():
+    def __repr__(self):
+        return '({}, {}, {})'.format(self.start, self.end, self.speed)
+
+class Route:
 
     route = []
 
@@ -68,15 +100,54 @@ class Route():
             y_step = b[1] - a[1]
             cc.append(str(freeman_coord2cc[(x_step, y_step)]))
         return start, ''.join(cc)
+    
+    def __repr__(self):
+        return '{}'.format(self.route)
 
-class Journey(Passenger, Route):
-    pass
+class Journey():
+    def __init__(self, route, passenger):
+        self.route = route
+        self.passenger = passenger
+
+    def plot_bus_load(self):
+        stops = {step[2]:0 for step in self.route if step[2]}
+        for passenger in passengers.values():
+            trip = passenger_trip(self.passenger, self.route)
+            stops[trip[0][1]] += 1
+            stops[trip[1][1]] -= 1
+        for i, stop in enumerate(stops):
+            if i > 0:
+                stops[stop] += stops[prev]
+            prev = stop
+        fig, ax = plt.subplots()
+        ax.step(range(len(stops)), list(stops.values()), where='post')
+        ax.set_xticks(range(len(stops)))
+        ax.set_xticklabels(list(stops.keys()))
+        plt.show()
+
+    def __repr__(self):
+        return 'Passenger List: {}'.format(self.passenger)
+
+    def __repr__(self):
+        return 'Route List: {}'.format(self.route)
 
 route = Route('route.csv')
 john = Passenger(start=(0,2), end=(8,1), speed=15)
-print(john.walk_time())
+john.walk_time()
 print(route.timetable())
 route.plot_map()
 start_point, cc = route.generate_cc()
 print((f"The bus route starts at {start_point} and\n"
        f"it's described by this chain code:\n{cc}"))
+passengers = [
+    Passenger(start, end, speed)
+    for start, end, speed
+    in read_passengers('passengers.csv')
+]
+journey = Journey(route, passengers)
+#print(passengers.__repr__())
+#print(route)
+print(journey.passenger)
+print(journey.route)
+print(journey.passenger_trip())
+             
