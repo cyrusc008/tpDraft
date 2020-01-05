@@ -2,7 +2,7 @@ import csv
 import math
 
 def passenger_trip(passenger, route):
-    start, end, pace = passenger
+    start, end, speed = read_passengers(...)
     stops = [value for value in route if value[2]]
     # calculate closer stops
     ## to start

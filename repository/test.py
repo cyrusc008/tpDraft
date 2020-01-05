@@ -123,6 +123,11 @@ passengers = [
 journey = Journey(route, passengers)
 #print(passengers.__repr__())
 #print(route)
-print(journey.passenger)
-print(journey.route)
-print(journey.plot_bus_load())
+#print(journey.passenger)
+#print(journey.route)
+#print(passengers.start)
+#print(journey.plot_bus_load())
+
+test_list = [((0, 2), (8, 1), 15)]
+test = [Passenger(start, end, speed) for start, end, speed in test_list]
+print(test.speed)
