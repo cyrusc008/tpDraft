@@ -3,34 +3,7 @@ import csv
 import matplotlib.pyplot as plt
 import math
 import types 
-
-def read_passengers(filename):
-    passenger = []
-    with open(filename, 'r') as data:
-        reader = csv.reader(data, delimiter=',')
-        headers = None
-        for row in reader:
-            line = [x for x in row]
-            start = (int(line[0]), int(line[1]))
-            end = (int(line[2]), int(line[3]))
-            speed = (int(line[4]))
-            data = (start, end, speed)
-            passenger.append(data)
-    return passenger
-
-def passenger_trip(passenger, route):
-    start, end, pace = passenger
-    stops = [value for value in route if value[2]]
-    # calculate closer stops
-    ## to start
-    distances = [(math.sqrt((x - start[0])**2 +
-                            (y - start[1])**2), stop) for x,y,stop in stops]
-    closer_start = min(distances)
-    ## to end
-    distances = [(math.sqrt((x - end[0])**2 +
-                            (y - end[1])**2), stop) for x,y,stop in stops]
-    closer_end = min(distances)
-    return (closer_start, closer_end)
+from functions import passenger_trip, read_passengers
 
 class Passenger:
     def __init__(self, start, end, speed):
@@ -110,8 +83,7 @@ class Journey():
         self.passenger = passenger
 
     def plot_bus_load(self):
-        stops = {step[2]:0 for step in self.route if step[2]}
-        for passenger in passengers.values():
+        for passenger in self.passenger:
             trip = passenger_trip(self.passenger, self.route)
             stops[trip[0][1]] += 1
             stops[trip[1][1]] -= 1
@@ -124,6 +96,10 @@ class Journey():
         ax.set_xticks(range(len(stops)))
         ax.set_xticklabels(list(stops.keys()))
         plt.show()
+
+    def __iter__(self):
+        stops = {step[2]:0 for step in self.route if step[2]}
+        return stops
 
     def __repr__(self):
         return 'Passenger List: {}'.format(self.passenger)
@@ -149,5 +125,4 @@ journey = Journey(route, passengers)
 #print(route)
 print(journey.passenger)
 print(journey.route)
-print(journey.passenger_trip())
-             
+print(journey.plot_bus_load())
