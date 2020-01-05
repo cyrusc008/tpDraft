@@ -4,4 +4,4 @@ python:
   - "3.8"
 # command to install dependencies
 #install: pip install unittest2
-script: pytest
+script: python travelplanner.py
