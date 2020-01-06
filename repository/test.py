@@ -3,7 +3,7 @@ import csv
 import matplotlib.pyplot as plt
 import math
 import types 
-from functions import passenger_trip, read_passengers
+from functions import read_passengers
 
 class Passenger:
     def __init__(self, start, end, speed):
@@ -24,8 +24,8 @@ class Route:
 
     def __init__(self, filename):
         self.filename = filename 
-
-    def timetable(self):
+    
+    def read_route(self):
         self.route = []
         with open(self.filename, 'r') as data:
             reader = list(csv.reader(data, delimiter=','))
@@ -33,7 +33,11 @@ class Route:
             for row in reader:
                 line = [x for x in row]
                 position = (int(line[0]), int(line[1]), line[2])
-                self.route.append(position)
+                self.route.append(position)    
+        return self.route    
+
+    def timetable(self):
+        self.route = Route.read_route(self)
         time = 0
         stops = {}
         for step in self.route:
@@ -77,14 +81,29 @@ class Route:
     def __repr__(self):
         return '{}'.format(self.route)
 
-class Journey():
+class Journey:
     def __init__(self, route, passenger):
         self.route = route
         self.passenger = passenger
 
     def plot_bus_load(self):
+        start = [i[0] for i in [x.start for x in self.passenger]]
+        end = [i[0] for i in [x.end for x in self.passenger]]
+        self.route = Route.read_route(route)
+        stops = [value for value in self.route if value[2]]
+        # calculate closer stops
+        ## to start
+        distances = [(math.sqrt((x - start[0])**2 +
+                                (y - start[1])**2), stop) for x,y,stop in stops]
+        closer_start = min(distances)
+        ## to end
+        distances = [(math.sqrt((x - end[0])**2 +
+                                (y - end[1])**2), stop) for x,y,stop in stops]
+        closer_end = min(distances)
+
+        stops = {step[2]:0 for step in self.route if step[2]}
         for passenger in self.passenger:
-            trip = passenger_trip(self.passenger, self.route)
+            trip = (closer_start, closer_end)
             stops[trip[0][1]] += 1
             stops[trip[1][1]] -= 1
         for i, stop in enumerate(stops):
@@ -96,10 +115,6 @@ class Journey():
         ax.set_xticks(range(len(stops)))
         ax.set_xticklabels(list(stops.keys()))
         plt.show()
-
-    def __iter__(self):
-        stops = {step[2]:0 for step in self.route if step[2]}
-        return stops
 
     def __repr__(self):
         return 'Passenger List: {}'.format(self.passenger)
@@ -126,8 +141,13 @@ journey = Journey(route, passengers)
 #print(journey.passenger)
 #print(journey.route)
 #print(passengers.start)
-#print(journey.plot_bus_load())
+journey.plot_bus_load()
 
 test_list = [((0, 2), (8, 1), 15)]
 test = [Passenger(start, end, speed) for start, end, speed in test_list]
-print(test.speed)
+start = [x.start for x in passengers]
+end = [x.end for x in passengers]
+speed = [x.speed for x in passengers]
+#print(start)
+#print(end)
+#print(speed)
