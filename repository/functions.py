@@ -1,5 +1,6 @@
 import csv 
 import math
+import argparse
 
 def read_passengers(filename):
     passenger = []
@@ -14,3 +15,18 @@ def read_passengers(filename):
             data = (start, end, speed)
             passenger.append(data)
     return passenger
+
+def import_speed():
+    parser = argparse.ArgumentParser(description="Import bus speed")
+    parser.add_argument("speed", help="bus speed per step", nargs='?', default=10)
+    args = parser.parse_args()
+    return args.speed
+
+def route_check(route):
+    """
+    Checks if numbers only
+    """
+    cc = route.generate_cc()[1]
+    cc_values = [int(x) for x in cc]
+    for i in range(len(cc)):
+        assert (cc_values[i] % 2) == 0

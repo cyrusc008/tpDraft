@@ -3,8 +3,9 @@ import csv
 import matplotlib.pyplot as plt
 import math
 import types 
-from functions import read_passengers
+from functions import read_passengers, import_speed, route_check
 from statistics import mean
+import argparse 
 
 class Passenger:
     def __init__(self, start, end, speed):
@@ -41,10 +42,11 @@ class Route:
         for step in self.route:
             if step[2]:
                 stops[step[2]] = time
-            time += 10
-        return stops 
+            time += int(import_speed())
+        return stops
     
     def plot_map(self):
+        self.route = Route.read_route(route)
         max_x = max([n[0] for n in self.route]) + 5 # adds padding
         max_y = max([n[1] for n in self.route]) + 5
         grid = np.zeros((max_y, max_x))
@@ -161,22 +163,28 @@ class Journey:
     def __repr__(self):
         return 'Route List: {}'.format(self.route)
 
-# route = Route('route.csv')
-# passengers = [
-#     Passenger(start, end, speed)
-#     for start, end, speed
-#     in read_passengers('passengers.csv')
-# ]
-# journey = Journey(route, passengers)
-# journey.plot_bus_load()
-
-route = Route("route.csv")
-john = Passenger(start=(0,2), end=(8,1), speed=15)
-mary = Passenger(start=(0,0), end=(6,2), speed=12)
-journey = Journey(route, [mary, john])
+route = Route('route.csv')
+route.plot_map()
+route_check(route)
+passengers = [
+    Passenger(start, end, speed)
+    for start, end, speed
+    in read_passengers('passengers.csv')
+]
+journey = Journey(route, passengers)
 journey.plot_bus_load()
+
+# route = Route("route.csv")
+# route.plot_map()
+# route_check(route)
+# john = Passenger(start=(0,2), end=(8,1), speed=15)
+# mary = Passenger(start=(0,0), end=(6,2), speed=12)
+# journey = Journey(route, [mary, john])
+# journey.plot_bus_load()
 
 journey.print_time_stats()
 tracker = {int(i): {'bus': journey.passenger_trip_time()[0][i], 
                     'walk': journey.passenger_trip_time()[1][i]} for i in range(len(journey.passenger))}
 journey.travel_time(0)
+
+
