@@ -84,10 +84,11 @@ class Journey:
         self.route = route
         self.passenger = passenger
 
-    def passenger_trip(passenger, route):
+    def passenger_trip(self, passenger):
+        self.route = Route.read_route(route)
         start = passenger.start
         end = passenger.end
-        stops = [value for value in route if value[2]]
+        stops = [value for value in self.route if value[2]]
         # calculate closer stops
         ## to start
         distances = [(math.sqrt((x - start[0])**2 +
@@ -101,10 +102,10 @@ class Journey:
 
     def plot_bus_load(self):
         self.route = Route.read_route(route)
-        self.passenger = passengers
+        self.passenger = journey.passenger
         stops = {step[2]:0 for step in self.route if step[2]}
         for passenger in self.passenger:
-            trip = Journey.passenger_trip(passenger, self.route)
+            trip = Journey.passenger_trip(self, passenger)
             stops[trip[0][1]] += 1
             stops[trip[1][1]] -= 1
             #check = print(trip)
@@ -121,11 +122,11 @@ class Journey:
 
     def passenger_trip_time(self):
         bus_times = Route.timetable(route)
-        self.passenger = passengers
+        self.passenger = journey.passenger
         time_bus = []
         time_walk = []
         for passenger in self.passenger:    
-            walk_distance_stops = Journey.passenger_trip(passenger, self.route)     
+            walk_distance_stops = Journey.passenger_trip(self, passenger)     
             bus_checker = bus_times[walk_distance_stops[1][1]] - \
                                 bus_times[walk_distance_stops[0][1]] 
             walk_checker = Passenger.walk_time(passenger)          
@@ -144,8 +145,9 @@ class Journey:
             time_walk.append(float(walk_travel))
         return time_bus, time_walk
 
-    def travel_time(passenger_id):
-        pass
+    def travel_time(self, i):
+        trip_values = tracker[i]
+        return print(trip_values)
 
     def print_time_stats(self):
         bus_average = mean(Journey.passenger_trip_time(self)[0])
@@ -159,15 +161,22 @@ class Journey:
     def __repr__(self):
         return 'Route List: {}'.format(self.route)
 
-route = Route('route.csv')
+# route = Route('route.csv')
+# passengers = [
+#     Passenger(start, end, speed)
+#     for start, end, speed
+#     in read_passengers('passengers.csv')
+# ]
+# journey = Journey(route, passengers)
+# journey.plot_bus_load()
+
+route = Route("route.csv")
 john = Passenger(start=(0,2), end=(8,1), speed=15)
 mary = Passenger(start=(0,0), end=(6,2), speed=12)
-passengers = [
-    Passenger(start, end, speed)
-    for start, end, speed
-    in read_passengers('passengers.csv')
-]
-journey = Journey(route, passengers)
+journey = Journey(route, [mary, john])
 journey.plot_bus_load()
-print(journey.passenger_trip_time())
+
 journey.print_time_stats()
+tracker = {int(i): {'bus': journey.passenger_trip_time()[0][i], 
+                    'walk': journey.passenger_trip_time()[1][i]} for i in range(len(journey.passenger))}
+journey.travel_time(0)
