@@ -86,34 +86,31 @@ class Journey:
         self.route = route
         self.passenger = passenger
 
-    def passenger_trip(self):
-        start_one = [i[0] for i in [x.start for x in self.passenger]]
-        start_two = [i[1] for i in [x.start for x in self.passenger]]
-        end_one = [i[0] for i in [x.end for x in self.passenger]]
-        end_two = [i[1] for i in [x.end for x in self.passenger]]
-        self.route = Route.read_route(route)
-        stops = [value for value in self.route if value[2]]
+    def passenger_trip(passenger, route):
+        start = passenger.start
+        end = passenger.end
+        stops = [value for value in route if value[2]]
         # calculate closer stops
         ## to start
-        for i in range(len(start_one)):
-            distances = [(math.sqrt((x - start_one[i])**2 +
-                                    (y - start_two[i])**2), stop) for x,y,stop in stops]
-            closer_start = min(distances)
-            ## to end
-            distances = [(math.sqrt((x - end_one[i])**2 +
-                                    (y - end_two[i])**2), stop) for x,y,stop in stops]
-            closer_end = min(distances)
-
+        distances = [(math.sqrt((x - start[0])**2 +
+                                (y - start[1])**2), stop) for x,y,stop in stops]
+        closer_start = min(distances)
+        ## to end
+        distances = [(math.sqrt((x - end[0])**2 +
+                                (y - end[1])**2), stop) for x,y,stop in stops]
+        closer_end = min(distances)
         return (closer_start, closer_end)
+        return print(start)
 
     def plot_bus_load(self):
         self.route = Route.read_route(route)
-        self.passenger = passengers 
+        self.passenger = passengers
         stops = {step[2]:0 for step in self.route if step[2]}
         for passenger in self.passenger:
-            trip = Journey.passenger_trip(self)
+            trip = Journey.passenger_trip(passenger, self.route)
             stops[trip[0][1]] += 1
             stops[trip[1][1]] -= 1
+            check = print(trip)
         for i, stop in enumerate(stops):
             if i > 0:
                 stops[stop] += stops[prev]
@@ -123,6 +120,7 @@ class Journey:
         ax.set_xticks(range(len(stops)))
         ax.set_xticklabels(list(stops.keys()))
         plt.show()
+        return check
 
     def __repr__(self):
         return 'Passenger List: {}'.format(self.passenger)
