@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import math
 import types 
 from functions import read_passengers
+from statistics import mean
 
 class Passenger:
     def __init__(self, start, end, speed):
@@ -13,15 +14,12 @@ class Passenger:
 
     def walk_time(self): 
         times = math.sqrt((self.start[0] - self.end[0])**2 + (self.start[1] - self.end[1])**2)*self.speed
-        return print(f" Walking Time: {times} minutes") 
+        return times 
 
     def __repr__(self):
         return '({}, {}, {})'.format(self.start, self.end, self.speed)
 
 class Route:
-
-    route = []
-
     def __init__(self, filename):
         self.filename = filename 
     
@@ -77,7 +75,7 @@ class Route:
             y_step = b[1] - a[1]
             cc.append(str(freeman_coord2cc[(x_step, y_step)]))
         return start, ''.join(cc)
-    
+
     def __repr__(self):
         return '{}'.format(self.route)
 
@@ -100,7 +98,6 @@ class Journey:
                                 (y - end[1])**2), stop) for x,y,stop in stops]
         closer_end = min(distances)
         return (closer_start, closer_end)
-        return print(start)
 
     def plot_bus_load(self):
         self.route = Route.read_route(route)
@@ -110,7 +107,7 @@ class Journey:
             trip = Journey.passenger_trip(passenger, self.route)
             stops[trip[0][1]] += 1
             stops[trip[1][1]] -= 1
-            check = print(trip)
+            #check = print(trip)
         for i, stop in enumerate(stops):
             if i > 0:
                 stops[stop] += stops[prev]
@@ -120,7 +117,41 @@ class Journey:
         ax.set_xticks(range(len(stops)))
         ax.set_xticklabels(list(stops.keys()))
         plt.show()
-        return check
+        #return check
+
+    def passenger_trip_time(self):
+        bus_times = Route.timetable(route)
+        self.passenger = passengers
+        time_bus = []
+        time_walk = []
+        for passenger in self.passenger:    
+            walk_distance_stops = Journey.passenger_trip(passenger, self.route)     
+            bus_checker = bus_times[walk_distance_stops[1][1]] - \
+                                bus_times[walk_distance_stops[0][1]] 
+            walk_checker = Passenger.walk_time(passenger)          
+            if bus_checker > 0:       
+                    if bus_checker >= walk_checker:
+                        bus_travel = 0
+                        walk_travel = walk_checker    
+                    else:           
+                        bus_travel = bus_checker
+                        walk_travel = walk_distance_stops[0][0] * passenger.speed + \
+                                      walk_distance_stops[1][0] * passenger.speed      
+            else:
+                bus_travel = 0
+                walk_travel = walk_checker
+            time_bus.append(float(bus_travel))
+            time_walk.append(float(walk_travel))
+        return time_bus, time_walk
+
+    def travel_time(passenger_id):
+        pass
+
+    def print_time_stats(self):
+        bus_average = mean(Journey.passenger_trip_time(self)[0])
+        walk_average = mean(Journey.passenger_trip_time(self)[1])
+        print(f"Average time on bus: {bus_average:03.2f} min")
+        print(f"Average walking time: {walk_average:03.2f} min")
 
     def __repr__(self):
         return 'Passenger List: {}'.format(self.passenger)
@@ -130,30 +161,13 @@ class Journey:
 
 route = Route('route.csv')
 john = Passenger(start=(0,2), end=(8,1), speed=15)
-john.walk_time()
-print(route.timetable())
-route.plot_map()
-start_point, cc = route.generate_cc()
-print((f"The bus route starts at {start_point} and\n"
-       f"it's described by this chain code:\n{cc}"))
+mary = Passenger(start=(0,0), end=(6,2), speed=12)
 passengers = [
     Passenger(start, end, speed)
     for start, end, speed
     in read_passengers('passengers.csv')
 ]
 journey = Journey(route, passengers)
-#print(passengers.__repr__())
-#print(route)
-#print(journey.passenger)
-#print(journey.route)
-#print(passengers.start)
 journey.plot_bus_load()
-
-test_list = [((0, 2), (8, 1), 15)]
-test = [Passenger(start, end, speed) for start, end, speed in test_list]
-start = [x.start for x in passengers]
-end = [x.end for x in passengers]
-speed = [x.speed for x in passengers]
-#print(start)
-#print(end)
-#print(speed)
+print(journey.passenger_trip_time())
+journey.print_time_stats()
