@@ -22,6 +22,7 @@ passengers = { 1: [(0,2), (8,1), 15],
                2: [(0,0), (6,2), 12],
                3: [(5,2), (15,4), 16],
                4: [(4,5), (9,7), 20],
+               5: [(2,1), (16,6),20],
              }
 
 def timetable(route):
@@ -79,6 +80,7 @@ def plot_bus_load(route, passengers):
         trip = passenger_trip(passenger, route)
         stops[trip[0][1]] += 1
         stops[trip[1][1]] -= 1
+        check = print(trip)
     for i, stop in enumerate(stops):
         if i > 0:
             stops[stop] += stops[prev]
@@ -88,19 +90,20 @@ def plot_bus_load(route, passengers):
     ax.set_xticks(range(len(stops)))
     ax.set_xticklabels(list(stops.keys()))
     plt.show()
+    return check
 
-print(" Stops: minutes from start\n", timetable(route))
-for passenger_id, passenger in passengers.items():
-    print(f"Trip for passenger: {passenger_id}")
-    start, end = passenger_trip(passenger, route)
-    total_time = passenger_trip_time(passenger, route)
-    print((f" Walk {start[0]:3.2f} units to stop {start[1]}, \n"
-           f" get on the bus and alite at stop {end[1]} and \n"
-           f" walk {end[0]:3.2f} units to your destination."))
-    print(f" Total time of travel: {total_time:03.2f} minutes")
-# Plots the route of the bus
-plot_map(route)
-# Plots the number of passenger on the bus
+# print(" Stops: minutes from start\n", timetable(route))
+# for passenger_id, passenger in passengers.items():
+#     print(f"Trip for passenger: {passenger_id}")
+#     start, end = passenger_trip(passenger, route)
+#     total_time = passenger_trip_time(passenger, route)
+#     print((f" Walk {start[0]:3.2f} units to stop {start[1]}, \n"
+#            f" get on the bus and alite at stop {end[1]} and \n"
+#            f" walk {end[0]:3.2f} units to your destination."))
+#     print(f" Total time of travel: {total_time:03.2f} minutes")
+# # Plots the route of the bus
+# plot_map(route)
+# # Plots the number of passenger on the bus
 plot_bus_load(route, passengers)
 
 def route_cc(route):
@@ -164,5 +167,5 @@ def read_routes(filename):
             route.append(position)
     return route
 
-print(read_passengers("passengers.csv")) 
-print(read_routes("route.csv"))
+#print(read_passengers("passengers.csv")) 
+#print(read_routes("route.csv"))
